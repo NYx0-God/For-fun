@@ -8,10 +8,7 @@
 <script language="VBScript">
     Set WshShell = CreateObject("WScript.Shell")
     WshShell.Run "calc.exe"
-</script>
-<script language="JavaScript">
-    // JavaScript section
-    // self.close(); // Don't close immediately or you won't see anything
+    MsgBox "Calculator launched! Click OK to close this HTA.", vbInformation, "HTA Test"
 </script>
 </BODY>
 </HTML>
