@@ -1,15 +1,17 @@
-<html>
-      <head>
-            <script>
-                    var pay = 'calc.exe'
-                    new ActiveXObject('Wscript.shell').Run(pay);
-                  
-            </script>
-      </head>
-      <body>
-            <script>
-                        <H1>tesssssssst</H1>
-                    self.close();
-            </script>
-      </body>
-</html>
+<HTML>
+<HEAD>
+<TITLE>Test HTA</TITLE>
+<HTA:APPLICATION ID="TestApp" APPLICATIONNAME="Test" SCROLL="no">
+</HEAD>
+<BODY>
+<H1>Test HTA - Calculator should open</H1>
+<script language="VBScript">
+    Set WshShell = CreateObject("WScript.Shell")
+    WshShell.Run "calc.exe"
+</script>
+<script language="JavaScript">
+    // JavaScript section
+    // self.close(); // Don't close immediately or you won't see anything
+</script>
+</BODY>
+</HTML>
